@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ration System Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0f1e;
+      --surface: #111827;
+      --surface2: #1a2236;
+      --accent: #f97316;
+      --accent2: #fb923c;
+      --green: #22c55e;
+      --text: #f1f5f9;
+      --muted: #64748b;
+      --border: rgba(255,255,255,0.07);
+      --glow: rgba(249,115,22,0.25);
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      overflow-x: hidden;
+    }
+
+    /* Animated bg blobs */
+    body::before, body::after {
+      content: '';
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0.15;
+      pointer-events: none;
+      animation: floatBlob 8s ease-in-out infinite alternate;
+    }
+    body::before {
+      width: 500px; height: 500px;
+      background: var(--accent);
+      top: -100px; left: -100px;
+    }
+    body::after {
+      width: 400px; height: 400px;
+      background: #3b82f6;
+      bottom: -100px; right: -100px;
+      animation-delay: -4s;
+    }
+    @keyframes floatBlob {
+      from { transform: translate(0,0) scale(1); }
+      to   { transform: translate(40px, 40px) scale(1.1); }
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 3rem 2.5rem;
+      width: 100%;
+      max-width: 540px;
+      position: relative;
+      z-index: 1;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.5), 0 0 0 1px var(--border);
+      animation: slideUp 0.6s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Top accent line */
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 10%; right: 10%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      border-radius: 2px;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .logo {
+      width: 48px; height: 48px;
+      background: linear-gradient(135deg, var(--accent), #ef4444);
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem;
+      box-shadow: 0 8px 20px var(--glow);
+      flex-shrink: 0;
+    }
+
+    .header-text h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--text);
+    }
+    .header-text p {
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-weight: 300;
+    }
+
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(34,197,94,0.08);
+      border: 1px solid rgba(34,197,94,0.2);
+      border-radius: 100px;
+      padding: 0.4rem 1rem;
+      width: fit-content;
+      margin-bottom: 2rem;
+      font-size: 0.78rem;
+      color: var(--green);
+    }
+    .status-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    label.field-label {
+      display: block;
+      font-family: 'Syne', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--muted);
+      margin-bottom: 0.6rem;
+    }
+
+    .field { margin-bottom: 1.8rem; }
+
+    select {
+      width: 100%;
+      padding: 0.85rem 1.1rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      outline: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2364748b' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      cursor: pointer;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--glow);
+    }
+    select option { background: var(--surface2); }
+
+    .checkbox-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.7rem;
+    }
+
+    .check-item {
+      position: relative;
+    }
+    .check-item input[type="checkbox"] {
+      position: absolute;
+      opacity: 0;
+      width: 0; height: 0;
+    }
+    .check-item label {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 400;
+      color: var(--muted);
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .check-item label .icon {
+      font-size: 1.1rem;
+    }
+    .check-item label .checkmark {
+      width: 18px; height: 18px;
+      border-radius: 5px;
+      border: 1.5px solid var(--muted);
+      margin-left: auto;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+    .check-item input:checked + label {
+      border-color: var(--accent);
+      background: rgba(249,115,22,0.08);
+      color: var(--text);
+      box-shadow: 0 0 0 1px var(--accent);
+    }
+    .check-item input:checked + label .checkmark {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+    .check-item input:checked + label .checkmark::after {
+      content: '✓';
+      font-size: 0.7rem;
+      color: white;
+      font-weight: 700;
+    }
+    .check-item label:hover {
+      border-color: rgba(249,115,22,0.4);
+      color: var(--text);
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 2rem 0;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 1rem;
+      background: linear-gradient(135deg, var(--accent), #ef4444);
+      border: none;
+      border-radius: 14px;
+      color: white;
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 8px 24px var(--glow);
+      position: relative;
+      overflow: hidden;
+    }
+    .submit-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0.1);
+      transform: translateX(-100%);
+      transition: transform 0.4s;
+    }
+    .submit-btn:hover::before { transform: translateX(0); }
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px var(--glow);
+    }
+    .submit-btn:active { transform: translateY(0); }
+
+    .footer-note {
+      text-align: center;
+      margin-top: 1.5rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+    .footer-note span {
+      color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="header">
+      <div class="logo">🏪</div>
+      <div class="header-text">
+        <h1>Ration Control</h1>
+        <p>Public Distribution System — Admin Panel</p>
+      </div>
+    </div>
+
+    <div class="status-bar">
+      <div class="status-dot"></div>
+      System Online
+    </div>
+
+    <form method="POST" action="/">
+
+      <div class="field">
+        <label class="field-label" for="queue_status">Queue Status</label>
+        <select id="queue_status" name="queue_status" required>
+          <option value="" disabled selected>Select current status...</option>
+          <option value="Empty">🟢 &nbsp; Empty</option>
+          <option value="Manageable">🟡 &nbsp; Manageable</option>
+          <option value="Crowded">🔴 &nbsp; Crowded</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Available Items</label>
+        <div class="checkbox-grid">
+          <div class="check-item">
+            <input type="checkbox" id="rice" name="items" value="Rice"/>
+            <label for="rice">
+              <span class="icon">🌾</span> Rice
+              <span class="checkmark"></span>
+            </label>
+          </div>
+          <div class="check-item">
+            <input type="checkbox" id="sugar" name="items" value="Sugar"/>
+            <label for="sugar">
+              <span class="icon">🍬</span> Sugar
+              <span class="checkmark"></span>
+            </label>
+          </div>
+          <div class="check-item">
+            <input type="checkbox" id="wheat" name="items" value="Wheat"/>
+            <label for="wheat">
+              <span class="icon">🌿</span> Wheat
+              <span class="checkmark"></span>
+            </label>
+          </div>
+          <div class="check-item">
+            <input type="checkbox" id="oil" name="items" value="Oil"/>
+            <label for="oil">
+              <span class="icon">🫙</span> Oil
+              <span class="checkmark"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <button type="submit" class="submit-btn">
+        ⚡ Submit Update
+      </button>
+    </form>
+
+    <p class="footer-note">Data saved to <span>database.db</span> · Ration System v1.0</p>
+  </div>
+</body>
+</html>

@@ -1,12 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ration System Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap"
+    rel="stylesheet" />
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     :root {
       --bg: #0a0f1e;
@@ -17,8 +26,8 @@
       --green: #22c55e;
       --text: #f1f5f9;
       --muted: #64748b;
-      --border: rgba(255,255,255,0.07);
-      --glow: rgba(249,115,22,0.25);
+      --border: rgba(255, 255, 255, 0.07);
+      --glow: rgba(249, 115, 22, 0.25);
     }
 
     body {
@@ -34,7 +43,8 @@
     }
 
     /* Animated bg blobs */
-    body::before, body::after {
+    body::before,
+    body::after {
       content: '';
       position: fixed;
       border-radius: 50%;
@@ -43,20 +53,32 @@
       pointer-events: none;
       animation: floatBlob 8s ease-in-out infinite alternate;
     }
+
     body::before {
-      width: 500px; height: 500px;
+      width: 500px;
+      height: 500px;
       background: var(--accent);
-      top: -100px; left: -100px;
+      top: -100px;
+      left: -100px;
     }
+
     body::after {
-      width: 400px; height: 400px;
+      width: 400px;
+      height: 400px;
       background: #3b82f6;
-      bottom: -100px; right: -100px;
+      bottom: -100px;
+      right: -100px;
       animation-delay: -4s;
     }
+
     @keyframes floatBlob {
-      from { transform: translate(0,0) scale(1); }
-      to   { transform: translate(40px, 40px) scale(1.1); }
+      from {
+        transform: translate(0, 0) scale(1);
+      }
+
+      to {
+        transform: translate(40px, 40px) scale(1.1);
+      }
     }
 
     .card {
@@ -68,19 +90,29 @@
       max-width: 540px;
       position: relative;
       z-index: 1;
-      box-shadow: 0 25px 60px rgba(0,0,0,0.5), 0 0 0 1px var(--border);
-      animation: slideUp 0.6s cubic-bezier(0.22,1,0.36,1) both;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--border);
+      animation: slideUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
     }
+
     @keyframes slideUp {
-      from { opacity: 0; transform: translateY(40px); }
-      to   { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     /* Top accent line */
     .card::before {
       content: '';
       position: absolute;
-      top: 0; left: 10%; right: 10%;
+      top: 0;
+      left: 10%;
+      right: 10%;
       height: 2px;
       background: linear-gradient(90deg, transparent, var(--accent), transparent);
       border-radius: 2px;
@@ -94,10 +126,13 @@
     }
 
     .logo {
-      width: 48px; height: 48px;
+      width: 48px;
+      height: 48px;
       background: linear-gradient(135deg, var(--accent), #ef4444);
       border-radius: 14px;
-      display: flex; align-items: center; justify-content: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       font-size: 1.5rem;
       box-shadow: 0 8px 20px var(--glow);
       flex-shrink: 0;
@@ -110,6 +145,7 @@
       letter-spacing: -0.5px;
       color: var(--text);
     }
+
     .header-text p {
       font-size: 0.8rem;
       color: var(--muted);
@@ -120,8 +156,8 @@
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      background: rgba(34,197,94,0.08);
-      border: 1px solid rgba(34,197,94,0.2);
+      background: rgba(34, 197, 94, 0.08);
+      border: 1px solid rgba(34, 197, 94, 0.2);
       border-radius: 100px;
       padding: 0.4rem 1rem;
       width: fit-content;
@@ -129,15 +165,27 @@
       font-size: 0.78rem;
       color: var(--green);
     }
+
     .status-dot {
-      width: 7px; height: 7px;
+      width: 7px;
+      height: 7px;
       border-radius: 50%;
       background: var(--green);
       animation: pulse 2s infinite;
     }
+
     @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50%       { opacity: 0.5; transform: scale(0.8); }
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.5;
+        transform: scale(0.8);
+      }
     }
 
     label.field-label {
@@ -151,7 +199,9 @@
       margin-bottom: 0.6rem;
     }
 
-    .field { margin-bottom: 1.8rem; }
+    .field {
+      margin-bottom: 1.8rem;
+    }
 
     select {
       width: 100%;
@@ -170,11 +220,15 @@
       cursor: pointer;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
+
     select:focus {
       border-color: var(--accent);
       box-shadow: 0 0 0 3px var(--glow);
     }
-    select option { background: var(--surface2); }
+
+    select option {
+      background: var(--surface2);
+    }
 
     .checkbox-grid {
       display: grid;
@@ -185,11 +239,14 @@
     .check-item {
       position: relative;
     }
+
     .check-item input[type="checkbox"] {
       position: absolute;
       opacity: 0;
-      width: 0; height: 0;
+      width: 0;
+      height: 0;
     }
+
     .check-item label {
       display: flex;
       align-items: center;
@@ -205,36 +262,45 @@
       transition: all 0.2s;
       user-select: none;
     }
+
     .check-item label .icon {
       font-size: 1.1rem;
     }
+
     .check-item label .checkmark {
-      width: 18px; height: 18px;
+      width: 18px;
+      height: 18px;
       border-radius: 5px;
       border: 1.5px solid var(--muted);
       margin-left: auto;
-      display: flex; align-items: center; justify-content: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       transition: all 0.2s;
       flex-shrink: 0;
     }
-    .check-item input:checked + label {
+
+    .check-item input:checked+label {
       border-color: var(--accent);
-      background: rgba(249,115,22,0.08);
+      background: rgba(249, 115, 22, 0.08);
       color: var(--text);
       box-shadow: 0 0 0 1px var(--accent);
     }
-    .check-item input:checked + label .checkmark {
+
+    .check-item input:checked+label .checkmark {
       background: var(--accent);
       border-color: var(--accent);
     }
-    .check-item input:checked + label .checkmark::after {
+
+    .check-item input:checked+label .checkmark::after {
       content: '✓';
       font-size: 0.7rem;
       color: white;
       font-weight: 700;
     }
+
     .check-item label:hover {
-      border-color: rgba(249,115,22,0.4);
+      border-color: rgba(249, 115, 22, 0.4);
       color: var(--text);
     }
 
@@ -261,20 +327,28 @@
       position: relative;
       overflow: hidden;
     }
+
     .submit-btn::before {
       content: '';
       position: absolute;
       inset: 0;
-      background: rgba(255,255,255,0.1);
+      background: rgba(255, 255, 255, 0.1);
       transform: translateX(-100%);
       transition: transform 0.4s;
     }
-    .submit-btn:hover::before { transform: translateX(0); }
+
+    .submit-btn:hover::before {
+      transform: translateX(0);
+    }
+
     .submit-btn:hover {
       transform: translateY(-2px);
       box-shadow: 0 12px 32px var(--glow);
     }
-    .submit-btn:active { transform: translateY(0); }
+
+    .submit-btn:active {
+      transform: translateY(0);
+    }
 
     .footer-note {
       text-align: center;
@@ -282,11 +356,13 @@
       font-size: 0.75rem;
       color: var(--muted);
     }
+
     .footer-note span {
       color: var(--accent);
     }
   </style>
 </head>
+
 <body>
   <div class="card">
     <div class="header">
@@ -300,6 +376,23 @@
     <div class="status-bar">
       <div class="status-dot"></div>
       System Online
+    </div>
+
+    <div
+      style="background: rgba(249,115,22,0.1); border: 1px solid var(--accent); border-radius: 16px; padding: 1.2rem; margin-bottom: 2rem;">
+      <h4
+        style="font-family: 'Syne', sans-serif; font-size: 0.8rem; text-transform: uppercase; color: var(--accent); margin-bottom: 0.5rem; letter-spacing: 1px;">
+        Suggested Visiting Time</h4>
+      <p style="font-size: 1.1rem; font-weight: 600; color: var(--text);">🕒 {{ recommendation }}</p>
+      <p style="font-size: 0.75rem; color: var(--muted); margin-top: 0.4rem;">Based on historical 'Empty' status
+        reports.</p>
+    </div>
+
+    <div style="margin-bottom: 2.5rem;">
+      <a href="/register"
+        style="display: block; text-align: center; padding: 0.8rem; background: var(--surface2); border: 1px dashed var(--muted); border-radius: 12px; color: var(--text); text-decoration: none; font-size: 0.9rem; transition: 0.2s;">
+        ➕ Register New User for SMS Alerts
+      </a>
     </div>
 
     <form method="POST" action="/">
@@ -318,28 +411,28 @@
         <label class="field-label">Available Items</label>
         <div class="checkbox-grid">
           <div class="check-item">
-            <input type="checkbox" id="rice" name="items" value="Rice"/>
+            <input type="checkbox" id="rice" name="items" value="Rice" />
             <label for="rice">
               <span class="icon">🌾</span> Rice
               <span class="checkmark"></span>
             </label>
           </div>
           <div class="check-item">
-            <input type="checkbox" id="sugar" name="items" value="Sugar"/>
+            <input type="checkbox" id="sugar" name="items" value="Sugar" />
             <label for="sugar">
               <span class="icon">🍬</span> Sugar
               <span class="checkmark"></span>
             </label>
           </div>
           <div class="check-item">
-            <input type="checkbox" id="wheat" name="items" value="Wheat"/>
+            <input type="checkbox" id="wheat" name="items" value="Wheat" />
             <label for="wheat">
               <span class="icon">🌿</span> Wheat
               <span class="checkmark"></span>
             </label>
           </div>
           <div class="check-item">
-            <input type="checkbox" id="oil" name="items" value="Oil"/>
+            <input type="checkbox" id="oil" name="items" value="Oil" />
             <label for="oil">
               <span class="icon">🫙</span> Oil
               <span class="checkmark"></span>
@@ -358,4 +451,5 @@
     <p class="footer-note">Data saved to <span>database.db</span> · Ration System v1.0</p>
   </div>
 </body>
+
 </html>

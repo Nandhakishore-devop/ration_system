@@ -2,135 +2,86 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>User Registration - Ration System</title>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap"
-        rel="stylesheet" />
-    <style>
-        *,
-        *::before,
-        *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        :root {
-            --bg: #0a0f1e;
-            --surface: #111827;
-            --surface2: #1a2236;
-            --accent: #3b82f6;
-            --text: #f1f5f9;
-            --muted: #64748b;
-            --border: rgba(255, 255, 255, 0.07);
-        }
-
-        body {
-            font-family: 'DM Sans', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
-        }
-
-        .card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 3rem 2.5rem;
-            width: 100%;
-            max-width: 440px;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
-        }
-
-        h1 {
-            font-family: 'Syne', sans-serif;
-            margin-bottom: 0.5rem;
-            font-size: 1.8rem;
-        }
-
-        p {
-            color: var(--muted);
-            margin-bottom: 2rem;
-            font-size: 0.9rem;
-        }
-
-        .field {
-            margin-bottom: 1.5rem;
-        }
-
-        label {
-            display: block;
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            color: var(--muted);
-            margin-bottom: 0.5rem;
-            letter-spacing: 1px;
-        }
-
-        input {
-            width: 100%;
-            padding: 1rem;
-            background: var(--surface2);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            color: var(--text);
-            outline: none;
-            transition: all 0.2s;
-        }
-
-        input:focus {
-            border-color: var(--accent);
-        }
-
-        .btn {
-            width: 100%;
-            padding: 1rem;
-            background: var(--accent);
-            border: none;
-            border-radius: 12px;
-            color: white;
-            font-weight: 700;
-            cursor: pointer;
-            margin-top: 1rem;
-        }
-
-        .back {
-            display: block;
-            text-align: center;
-            margin-top: 1.5rem;
-            color: var(--muted);
-            text-decoration: none;
-            font-size: 0.85rem;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Registration - Smart Ration</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
 <body>
-    <div class="card">
-        <h1>Get Alerts</h1>
-        <p>Register your phone number to receive Tamil SMS updates about ration queue status and item availability.</p>
-
-        <form method="POST">
-            <div class="field">
-                <label>Full Name</label>
-                <input type="text" name="name" placeholder="Enter your name" required>
+    <div class="app-container">
+        <header>
+            <div class="brand">
+                <div class="brand-icon">
+                    <i data-lucide="gem" color="white" size="24"></i>
+                </div>
+                <span>SMART RATION</span>
             </div>
-            <div class="field">
-                <label>Phone Number</label>
-                <input type="tel" name="phone" placeholder="+91 00000 00000" required>
-            </div>
-            <button type="submit" class="btn">Register for SMS</button>
-        </form>
 
-        <a href="/" class="back">← Back to Dashboard</a>
+            <nav>
+                <a href="/">Dashboard</a>
+                <a href="/register" class="active">New Registration</a>
+                <a href="/customers">Customer Details</a>
+            </nav>
+
+            <div class="header-actions">
+                <div style="width: 32px; height: 32px; border-radius: 50%; background: #ccc;"></div>
+            </div>
+        </header>
+
+        <main style="display: flex; justify-content: center; padding-top: 4rem;">
+            <div class="card" style="width: 100%; max-width: 500px; padding: 3rem;">
+                <div style="text-align: center; margin-bottom: 2.5rem;">
+                    <div
+                        style="width: 64px; height: 64px; background: rgba(55, 114, 255, 0.1); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+                        <i data-lucide="user-plus" size="32" color="var(--accent)"></i>
+                    </div>
+                    <h1 style="font-size: 1.75rem; margin-bottom: 0.5rem;">Beneficiary Registration</h1>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">Add a new phone number to receive real-time
+                        ration alerts.</p>
+                </div>
+
+                <form method="POST" action="/register">
+                    <div style="margin-bottom: 1.5rem;">
+                        <label
+                            style="display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 0.5rem;">Full
+                            Name</label>
+                        <input type="text" name="name" required placeholder="e.g. Nandha Kishore"
+                            style="width: 100%; background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 1rem; border-radius: 12px; color: white; outline: none; transition: border-color 0.3s;">
+                    </div>
+
+                    <div style="margin-bottom: 2.5rem;">
+                        <label
+                            style="display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 0.5rem;">Phone
+                            Number</label>
+                        <input type="tel" name="phone" required placeholder="e.g. +91 999 000 1234"
+                            style="width: 100%; background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 1rem; border-radius: 12px; color: white; outline: none; transition: border-color 0.3s;">
+                    </div>
+
+                    <button type="submit" class="btn-panel"
+                        style="width: 100%; background: var(--accent); color: white; border: none; justify-content: center; padding: 1rem;">
+                        Register Beneficiary <i data-lucide="arrow-right" size="18"></i>
+                    </button>
+                </form>
+
+                <p style="text-align: center; margin-top: 1.5rem; font-size: 0.85rem; color: var(--text-muted);">
+                    By registering, the user agrees to receive automated SMS notifications from the Smart Ration System.
+                </p>
+            </div>
+        </main>
     </div>
+
+    <script>
+        lucide.createIcons();
+        document.querySelectorAll('input').forEach(input => {
+            input.onfocus = () => input.style.borderColor = 'var(--accent)';
+            input.onblur = () => input.style.borderColor = 'var(--border)';
+        });
+    </script>
 </body>
 
 </html>

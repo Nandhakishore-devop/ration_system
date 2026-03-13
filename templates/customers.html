@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Details - Smart Ration</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .customer-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 2rem;
+            background: var(--surface);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .customer-table th,
+        .customer-table td {
+            padding: 1.25rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .customer-table th {
+            background: rgba(255, 255, 255, 0.02);
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+        }
+
+        .customer-table tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .avatar-small {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #7f56d9, var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <header>
+            <div class="brand">
+                <div class="brand-icon">
+                    <i data-lucide="gem" color="white" size="24"></i>
+                </div>
+                <span>SMART RATION</span>
+            </div>
+
+            <nav>
+                <a href="/">Dashboard</a>
+                <a href="/register">New Registration</a>
+                <a href="/customers" class="active">Customer Details</a>
+            </nav>
+
+            <div class="header-actions">
+                <div class="search-box">
+                    <i data-lucide="search" size="18" color="#9ba1b0"></i>
+                    <input type="text" id="customerSearch" placeholder="Search customers...">
+                </div>
+                <i data-lucide="bell" size="20" color="#9ba1b0"></i>
+                <div style="width: 32px; height: 32px; border-radius: 50%; background: #ccc;"></div>
+            </div>
+        </header>
+
+        <main>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <div>
+                    <h1 style="font-size: 2.2rem; margin-bottom: 0.5rem;">Customer Details</h1>
+                    <p style="color: var(--text-muted);">View and manage registered beneficiaries and their SMS alert
+                        preferences.</p>
+                </div>
+                <a href="/register" class="btn-panel" style="background: var(--accent); color: white; border: none;">
+                    <i data-lucide="user-plus" size="18"></i> Add Customer
+                </a>
+            </div>
+
+            <table class="customer-table card">
+                <thead>
+                    <tr>
+                        <th>Beneficiary</th>
+                        <th>Phone Number</th>
+                        <th>Status</th>
+                        <th>Registration Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr class="customer-row" id="row-{{ user[0] }}">
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <div class="avatar-small">{{ user[2][0]|upper if user[2] else 'U' }}</div>
+                                <div>
+                                    <div style="font-weight: 600;" class="customer-name" id="name-{{ user[0] }}">{{
+                                        user[2] or 'Unnamed User' }}</div>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted);">Family Head</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <code style="color: var(--accent);" class="customer-phone"
+                                id="phone-{{ user[0] }}">{{ user[1] }}</code>
+                        </td>
+                        <td>
+                            <span class="badge badge-active"
+                                style="padding: 0.1rem 0.5rem; font-size: 0.65rem;">Verified</span>
+                        </td>
+                        <td><span style="color: var(--text-muted); font-size: 0.85rem;">March 10, 2026</span></td>
+                        <td>
+                            <div style="display: flex; gap: 0.75rem;">
+                                <i data-lucide="edit-3" size="18" color="#9ba1b0" style="cursor: pointer;"
+                                    onclick="openEditModal('{{ user[0] }}')"></i>
+                                <form action="/delete_customer/{{ user[0] }}" method="POST" style="display: inline;"
+                                    onsubmit="return confirm('Are you sure you want to delete this beneficiary?')">
+                                    <button type="submit"
+                                        style="background: transparent; border: none; cursor: pointer; padding: 0;">
+                                        <i data-lucide="trash-2" size="18" color="#ef466f"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </main>
+    </div>
+
+    <!-- Simple Edit Modal -->
+    <div id="editModal"
+        style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+        <div class="card glass" style="width: 100%; max-width: 400px; padding: 2rem;">
+            <h2 style="margin-bottom: 1.5rem;">Edit Beneficiary</h2>
+            <form id="editForm" method="POST">
+                <div style="margin-bottom: 1rem;">
+                    <label style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Name</label>
+                    <input type="text" name="name" id="editName" required
+                        style="width: 100%; background: var(--surface); border: 1px solid var(--border); color: white; padding: 0.75rem; border-radius: 8px;">
+                </div>
+                <div style="margin-bottom: 2rem;">
+                    <label style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Phone
+                        Number</label>
+                    <input type="text" name="phone" id="editPhone" required
+                        style="width: 100%; background: var(--surface); border: 1px solid var(--border); color: white; padding: 0.75rem; border-radius: 8px;">
+                </div>
+                <div style="display: flex; gap: 1rem;">
+                    <button type="submit" class="btn-panel"
+                        style="flex: 1; background: var(--accent); color: white; border: none; justify-content: center;">Save</button>
+                    <button type="button" onclick="closeEditModal()" class="btn-panel"
+                        style="flex: 1; background: transparent; border: 1px solid var(--border); color: var(--text-muted); justify-content: center;">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        function openEditModal(userId) {
+            const name = document.getElementById('name-' + userId).textContent;
+            const phone = document.getElementById('phone-' + userId).textContent;
+
+            document.getElementById('editName').value = name;
+            document.getElementById('editPhone').value = phone;
+            document.getElementById('editForm').action = '/edit_customer/' + userId;
+
+            document.getElementById('editModal').style.display = 'flex';
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        // Search Functionality
+        const searchInput = document.getElementById('customerSearch');
+        const rows = document.querySelectorAll('tbody tr');
+
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                if (text.includes(query)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

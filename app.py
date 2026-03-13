@@ -30,6 +30,50 @@ def init_db():
         )
     ''')
 
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS inventory (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT UNIQUE NOT NULL,
+            stock_kg REAL,
+            max_stock_kg REAL,
+            icon TEXT
+        )
+    ''')
+
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS queue_stats (
+            id INTEGER PRIMARY KEY CHECK (id = 1),
+            waiting_count INTEGER DEFAULT 0,
+            avg_wait TEXT DEFAULT '0m'
+        )
+    ''')
+
+    # Seed inventory if empty
+    cursor.execute("SELECT COUNT(*) FROM inventory")
+    if cursor.fetchone()[0] == 0:
+        items = [
+            ('Premium Rice(அரிசி)', 1240, 1500, '🌾'),
+            ('Refined Oil(எண்ணெய்)', 480, 1000, '💧'),
+            ('Whole Wheat(கோதுமை)', 950, 1200, '🌾'),
+            ('Fine Sugar(சர்க்கரை)', 120, 500, '🍦')
+        ]
+        cursor.executemany("INSERT INTO inventory (name, stock_kg, max_stock_kg, icon) VALUES (?, ?, ?, ?)", items)
+    else:
+        # Migration: Add Tamil to existing items if not present
+        mapping = {
+            'Premium Rice': 'Premium Rice(அரிசி)',
+            'Refined Oil': 'Refined Oil(எண்ணெய்)',
+            'Whole Wheat': 'Whole Wheat(கோதுமை)',
+            'Fine Sugar': 'Fine Sugar(சர்க்கரை)'
+        }
+        for old, new in mapping.items():
+            cursor.execute("UPDATE inventory SET name = ? WHERE name = ?", (new, old))
+
+    # Seed queue_stats if empty
+    cursor.execute("SELECT COUNT(*) FROM queue_stats")
+    if cursor.fetchone()[0] == 0:
+        cursor.execute("INSERT INTO queue_stats (id, waiting_count, avg_wait) VALUES (1, 42, '8m')")
+
     conn.commit()
     conn.close()
 
@@ -144,29 +188,100 @@ def analyze_best_time():
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+
     if request.method == 'POST':
         queue_status = request.form.get('queue_status')
         items = request.form.getlist('items')
         items_string = ", ".join(items)
 
-        conn = sqlite3.connect('database.db')
-        cursor = conn.cursor()
-
         cursor.execute(
             "INSERT INTO updates (queue_status, items) VALUES (?, ?)",
             (queue_status, items_string)
         )
-
         conn.commit()
-        conn.close()
 
         # Trigger SMS simulation
         count = simulate_sms_sending(queue_status, items_string)
-
+        
+        # After update, we could also decrement stock here if we want, 
+        # but for now we just log it.
+        
         return f"<h2>Data Saved & {count} SMS Simulants Logged ✅</h2><a href='/'>Go Back</a>"
 
+    # Fetch recommendation
     recommendation = analyze_best_time()
-    return render_template('dashboard.html', recommendation=recommendation)
+    
+    # Fetch inventory
+    cursor.execute("SELECT * FROM inventory")
+    inventory = cursor.fetchall()
+    
+    # Fetch recent updates (optional missed feature)
+    cursor.execute("SELECT * FROM updates ORDER BY timestamp DESC LIMIT 5")
+    recent_updates = cursor.fetchall()
+    
+    # Fetch user count
+    cursor.execute("SELECT COUNT(*) FROM users")
+    user_count = cursor.fetchone()[0]
+
+    # Fetch queue stats
+    cursor.execute("SELECT waiting_count, avg_wait FROM queue_stats WHERE id = 1")
+    q_stats = cursor.fetchone()
+    waiting_count = q_stats[0] if q_stats else 42
+    avg_wait = q_stats[1] if q_stats else '8m'
+
+    conn.close()
+    return render_template('dashboard.html', 
+                           recommendation=recommendation, 
+                           inventory=inventory,
+                           recent_updates=recent_updates,
+                           user_count=user_count,
+                           waiting_count=waiting_count,
+                           avg_wait=avg_wait)
+
+@app.route('/update_stats', methods=['POST'])
+def update_stats():
+    waiting_count = request.form.get('waiting_count')
+    avg_wait = request.form.get('avg_wait')
+    
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+    cursor.execute("UPDATE queue_stats SET waiting_count = ?, avg_wait = ? WHERE id = 1", 
+                   (waiting_count, avg_wait))
+    conn.commit()
+    conn.close()
+    return redirect(url_for('home'))
+
+@app.route('/customers')
+def customers():
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM users")
+    users = cursor.fetchall()
+    conn.close()
+    return render_template('customers.html', users=users)
+
+@app.route('/edit_customer/<int:id>', methods=['POST'])
+def edit_customer(id):
+    name = request.form.get('name')
+    phone = request.form.get('phone')
+    
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+    cursor.execute("UPDATE users SET name = ?, phone_number = ? WHERE id = ?", (name, phone, id))
+    conn.commit()
+    conn.close()
+    return redirect(url_for('customers'))
+
+@app.route('/delete_customer/<int:id>', methods=['POST'])
+def delete_customer(id):
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM users WHERE id = ?", (id,))
+    conn.commit()
+    conn.close()
+    return redirect(url_for('customers'))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():

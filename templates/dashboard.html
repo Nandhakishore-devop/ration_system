@@ -2,454 +2,206 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ration System Dashboard</title>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap"
-    rel="stylesheet" />
-  <style>
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    :root {
-      --bg: #0a0f1e;
-      --surface: #111827;
-      --surface2: #1a2236;
-      --accent: #f97316;
-      --accent2: #fb923c;
-      --green: #22c55e;
-      --text: #f1f5f9;
-      --muted: #64748b;
-      --border: rgba(255, 255, 255, 0.07);
-      --glow: rgba(249, 115, 22, 0.25);
-    }
-
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem;
-      overflow-x: hidden;
-    }
-
-    /* Animated bg blobs */
-    body::before,
-    body::after {
-      content: '';
-      position: fixed;
-      border-radius: 50%;
-      filter: blur(100px);
-      opacity: 0.15;
-      pointer-events: none;
-      animation: floatBlob 8s ease-in-out infinite alternate;
-    }
-
-    body::before {
-      width: 500px;
-      height: 500px;
-      background: var(--accent);
-      top: -100px;
-      left: -100px;
-    }
-
-    body::after {
-      width: 400px;
-      height: 400px;
-      background: #3b82f6;
-      bottom: -100px;
-      right: -100px;
-      animation-delay: -4s;
-    }
-
-    @keyframes floatBlob {
-      from {
-        transform: translate(0, 0) scale(1);
-      }
-
-      to {
-        transform: translate(40px, 40px) scale(1.1);
-      }
-    }
-
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 3rem 2.5rem;
-      width: 100%;
-      max-width: 540px;
-      position: relative;
-      z-index: 1;
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--border);
-      animation: slideUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
-    }
-
-    @keyframes slideUp {
-      from {
-        opacity: 0;
-        transform: translateY(40px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    /* Top accent line */
-    .card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 10%;
-      right: 10%;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, var(--accent), transparent);
-      border-radius: 2px;
-    }
-
-    .header {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin-bottom: 2.5rem;
-    }
-
-    .logo {
-      width: 48px;
-      height: 48px;
-      background: linear-gradient(135deg, var(--accent), #ef4444);
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.5rem;
-      box-shadow: 0 8px 20px var(--glow);
-      flex-shrink: 0;
-    }
-
-    .header-text h1 {
-      font-family: 'Syne', sans-serif;
-      font-size: 1.5rem;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      color: var(--text);
-    }
-
-    .header-text p {
-      font-size: 0.8rem;
-      color: var(--muted);
-      font-weight: 300;
-    }
-
-    .status-bar {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      background: rgba(34, 197, 94, 0.08);
-      border: 1px solid rgba(34, 197, 94, 0.2);
-      border-radius: 100px;
-      padding: 0.4rem 1rem;
-      width: fit-content;
-      margin-bottom: 2rem;
-      font-size: 0.78rem;
-      color: var(--green);
-    }
-
-    .status-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--green);
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-
-      0%,
-      100% {
-        opacity: 1;
-        transform: scale(1);
-      }
-
-      50% {
-        opacity: 0.5;
-        transform: scale(0.8);
-      }
-    }
-
-    label.field-label {
-      display: block;
-      font-family: 'Syne', sans-serif;
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      color: var(--muted);
-      margin-bottom: 0.6rem;
-    }
-
-    .field {
-      margin-bottom: 1.8rem;
-    }
-
-    select {
-      width: 100%;
-      padding: 0.85rem 1.1rem;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      color: var(--text);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.95rem;
-      outline: none;
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2364748b' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 1rem center;
-      cursor: pointer;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-
-    select:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px var(--glow);
-    }
-
-    select option {
-      background: var(--surface2);
-    }
-
-    .checkbox-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.7rem;
-    }
-
-    .check-item {
-      position: relative;
-    }
-
-    .check-item input[type="checkbox"] {
-      position: absolute;
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-
-    .check-item label {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      padding: 0.75rem 1rem;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      cursor: pointer;
-      font-size: 0.9rem;
-      font-weight: 400;
-      color: var(--muted);
-      transition: all 0.2s;
-      user-select: none;
-    }
-
-    .check-item label .icon {
-      font-size: 1.1rem;
-    }
-
-    .check-item label .checkmark {
-      width: 18px;
-      height: 18px;
-      border-radius: 5px;
-      border: 1.5px solid var(--muted);
-      margin-left: auto;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s;
-      flex-shrink: 0;
-    }
-
-    .check-item input:checked+label {
-      border-color: var(--accent);
-      background: rgba(249, 115, 22, 0.08);
-      color: var(--text);
-      box-shadow: 0 0 0 1px var(--accent);
-    }
-
-    .check-item input:checked+label .checkmark {
-      background: var(--accent);
-      border-color: var(--accent);
-    }
-
-    .check-item input:checked+label .checkmark::after {
-      content: '✓';
-      font-size: 0.7rem;
-      color: white;
-      font-weight: 700;
-    }
-
-    .check-item label:hover {
-      border-color: rgba(249, 115, 22, 0.4);
-      color: var(--text);
-    }
-
-    .divider {
-      height: 1px;
-      background: var(--border);
-      margin: 2rem 0;
-    }
-
-    .submit-btn {
-      width: 100%;
-      padding: 1rem;
-      background: linear-gradient(135deg, var(--accent), #ef4444);
-      border: none;
-      border-radius: 14px;
-      color: white;
-      font-family: 'Syne', sans-serif;
-      font-size: 1rem;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      cursor: pointer;
-      transition: all 0.3s;
-      box-shadow: 0 8px 24px var(--glow);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .submit-btn::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: rgba(255, 255, 255, 0.1);
-      transform: translateX(-100%);
-      transition: transform 0.4s;
-    }
-
-    .submit-btn:hover::before {
-      transform: translateX(0);
-    }
-
-    .submit-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 32px var(--glow);
-    }
-
-    .submit-btn:active {
-      transform: translateY(0);
-    }
-
-    .footer-note {
-      text-align: center;
-      margin-top: 1.5rem;
-      font-size: 0.75rem;
-      color: var(--muted);
-    }
-
-    .footer-note span {
-      color: var(--accent);
-    }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Ration - Admin Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
 <body>
-  <div class="card">
-    <div class="header">
-      <div class="logo">🏪</div>
-      <div class="header-text">
-        <h1>Ration Control</h1>
-        <p>Public Distribution System — Admin Panel</p>
-      </div>
-    </div>
-
-    <div class="status-bar">
-      <div class="status-dot"></div>
-      System Online
-    </div>
-
-    <div
-      style="background: rgba(249,115,22,0.1); border: 1px solid var(--accent); border-radius: 16px; padding: 1.2rem; margin-bottom: 2rem;">
-      <h4
-        style="font-family: 'Syne', sans-serif; font-size: 0.8rem; text-transform: uppercase; color: var(--accent); margin-bottom: 0.5rem; letter-spacing: 1px;">
-        Suggested Visiting Time</h4>
-      <p style="font-size: 1.1rem; font-weight: 600; color: var(--text);">🕒 {{ recommendation }}</p>
-      <p style="font-size: 0.75rem; color: var(--muted); margin-top: 0.4rem;">Based on historical 'Empty' status
-        reports.</p>
-    </div>
-
-    <div style="margin-bottom: 2.5rem;">
-      <a href="/register"
-        style="display: block; text-align: center; padding: 0.8rem; background: var(--surface2); border: 1px dashed var(--muted); border-radius: 12px; color: var(--text); text-decoration: none; font-size: 0.9rem; transition: 0.2s;">
-        ➕ Register New User for SMS Alerts
-      </a>
-    </div>
-
-    <form method="POST" action="/">
-
-      <div class="field">
-        <label class="field-label" for="queue_status">Queue Status</label>
-        <select id="queue_status" name="queue_status" required>
-          <option value="" disabled selected>Select current status...</option>
-          <option value="Empty">🟢 &nbsp; Empty</option>
-          <option value="Manageable">🟡 &nbsp; Manageable</option>
-          <option value="Crowded">🔴 &nbsp; Crowded</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <label class="field-label">Available Items</label>
-        <div class="checkbox-grid">
-          <div class="check-item">
-            <input type="checkbox" id="rice" name="items" value="Rice" />
-            <label for="rice">
-              <span class="icon">🌾</span> Rice
-              <span class="checkmark"></span>
-            </label>
-          </div>
-          <div class="check-item">
-            <input type="checkbox" id="sugar" name="items" value="Sugar" />
-            <label for="sugar">
-              <span class="icon">🍬</span> Sugar
-              <span class="checkmark"></span>
-            </label>
-          </div>
-          <div class="check-item">
-            <input type="checkbox" id="wheat" name="items" value="Wheat" />
-            <label for="wheat">
-              <span class="icon">🌿</span> Wheat
-              <span class="checkmark"></span>
-            </label>
-          </div>
-          <div class="check-item">
-            <input type="checkbox" id="oil" name="items" value="Oil" />
-            <label for="oil">
-              <span class="icon">🫙</span> Oil
-              <span class="checkmark"></span>
-            </label>
-          </div>
+  <div class="app-container">
+    <header>
+      <div class="brand">
+        <div class="brand-icon">
+          <i data-lucide="gem" color="white" size="24"></i>
         </div>
+        <span>SMART RATION</span>
       </div>
 
-      <div class="divider"></div>
+      <nav>
+        <a href="/" class="active">Dashboard</a>
+        <a href="/register">New Registration</a>
+        <a href="/customers">Customer Details</a>
+      </nav>
 
-      <button type="submit" class="submit-btn">
-        ⚡ Submit Update
-      </button>
-    </form>
+      <div class="header-actions">
+        <div class="search-box">
+          <i data-lucide="search" size="18" color="#9ba1b0"></i>
+          <input type="text" id="recordSearch" placeholder="Search records...">
+        </div>
+        <i data-lucide="bell" size="20" color="#9ba1b0" style="cursor: pointer;"></i>
+        <i data-lucide="settings" size="20" color="#9ba1b0" style="cursor: pointer;"></i>
+        <div style="width: 32px; height: 32px; border-radius: 50%; background: #ccc; cursor: pointer;"></div>
+      </div>
+    </header>
 
-    <p class="footer-note">Data saved to <span>database.db</span> · Ration System v1.0</p>
+    <main class="dashboard-grid">
+      <!-- Left Side: Main Content -->
+      <div class="main-content">
+        <section>
+          <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem;">
+            <div>
+              <h1 style="font-size: 2.2rem; margin-bottom: 0.5rem;">Admin Dashboard</h1>
+              <p style="color: var(--text-muted);">Manage ration distribution and inventory with precision.</p>
+            </div>
+            <div class="badge badge-active">
+              <span style="font-size: 0.5rem; margin-right: 0.4rem;">●</span>
+              System Active: Region 04
+            </div>
+          </div>
+
+          <div class="card hero-card">
+            <div class="badge badge-premium">
+              <i data-lucide="shield-check" size="14" style="vertical-align: middle; margin-right: 4px;"></i>
+              Premium Access
+            </div>
+            <h2>Ration Control Panel</h2>
+            <p>Real-time oversight of smart distribution kiosks and supply chain logistics.</p>
+            <a href="#" class="btn-panel">
+              Open Panel <i data-lucide="chevron-right" size="18"></i>
+            </a>
+          </div>
+        </section>
+
+        <section class="commodities-section">
+          <h2><i data-lucide="archive" size="20"></i> Available Commodities</h2>
+
+          <form id="updateForm" method="POST" action="/">
+            <div class="commodity-grid">
+              {% for item in inventory %}
+              {% set percent = (item[2] / item[3]) * 100 %}
+              <div class="commodity-card" onclick="document.getElementById('check-{{ item[0] }}').click()">
+                <div class="commodity-header">
+                  <div class="commodity-icon">{{ item[4] }}</div>
+                  <input type="checkbox" name="items" value="{{ item[1] }}" id="check-{{ item[0] }}"
+                    style="transform: scale(1.3); cursor: pointer;" onclick="event.stopPropagation()">
+                </div>
+                <div class="commodity-info">
+                  <h3>{{ item[1] }}</h3>
+                  <p class="stock-label">Stock: {{ "{:,.0f}".format(item[2]) }} kg {{ ' (Low)' if percent < 30 else ''
+                      }}</p>
+                      <div class="progress-container">
+                        <div class="progress-bar {{ 'low' if percent < 30 else '' }}" style="width: {{ percent }}%;">
+                        </div>
+                      </div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+
+            <div class="submit-section">
+              <button type="submit" class="btn-submit">
+                <i data-lucide="check-square" size="20"></i>
+                SUBMIT UPDATE
+              </button>
+            </div>
+          </form>
+        </section>
+      </div>
+
+      <!-- Right Side: Sidebar -->
+      <aside class="sidebar">
+        <section class="card queue-section">
+          <h2>Queue Status</h2>
+          <p
+            style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.75rem;">
+            Select Active Queue</p>
+          <select class="queue-dropdown" name="queue_status" form="updateForm">
+            <option value="Empty">Active Queue - Priority Alpha (Empty)</option>
+            <option value="Manageable">Active Queue - Standard (Manageable)</option>
+            <option value="Crowded">Active Queue - Peak (Crowded)</option>
+          </select>
+
+          <div class="stats-grid">
+            <div class="stat-card glass" style="position: relative;">
+              <div class="stat-value" id="displayWaiting">{{ waiting_count }}</div>
+              <div class="stat-label">Waiting</div>
+              <button onclick="toggleEditStats()" 
+                      style="position: absolute; top: 5px; right: 5px; background: transparent; border: none; cursor: pointer; color: var(--text-muted);">
+                <i data-lucide="edit-2" size="12"></i>
+              </button>
+            </div>
+            <div class="stat-card glass" style="position: relative;">
+              <div class="stat-value" id="displayAvgWait">{{ avg_wait }}</div>
+              <div class="stat-label">Avg Wait</div>
+            </div>
+          </div>
+
+          <!-- Hidden Edit Form for Stats -->
+          <div id="editStatsForm" style="display: none; margin-top: 1.5rem; animation: fadeIn 0.3s forwards;">
+            <form action="/update_stats" method="POST" class="glass" style="padding: 1rem; border-radius: 12px;">
+              <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                <div style="flex: 1;">
+                  <label style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">Waiting</label>
+                  <input type="number" name="waiting_count" value="{{ waiting_count }}" required
+                         style="width: 100%; background: var(--surface); border: 1px solid var(--border); color: white; padding: 0.5rem; border-radius: 8px;">
+                </div>
+                <div style="flex: 1;">
+                  <label style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">Avg Wait</label>
+                  <input type="text" name="avg_wait" value="{{ avg_wait }}" required
+                         style="width: 100%; background: var(--surface); border: 1px solid var(--border); color: white; padding: 0.5rem; border-radius: 8px;">
+                </div>
+              </div>
+              <div style="display: flex; gap: 0.5rem;">
+                <button type="submit" class="btn-submit" style="padding: 0.5rem 1rem; font-size: 0.8rem; background: var(--accent); color: white;">Save Changes</button>
+                <button type="button" onclick="toggleEditStats()" style="padding: 0.5rem 1rem; font-size: 0.8rem; background: transparent; border: 1px solid var(--border); color: var(--text-muted); border-radius: 8px;">Cancel</button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <section class="card suggestion-section glass">
+          <h3 style="font-size: 0.9rem; color: var(--warning); text-transform: uppercase; margin-bottom: 1rem;">
+            Suggested Visiting Time</h3>
+          <div style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;">🕒 {{ recommendation }}</div>
+          <p style="color: var(--text-muted); font-size: 0.85rem;">Based on historical 'Empty' status reports for this
+            location.</p>
+        </section>
+
+        <section class="card logs-section glass">
+          <h3 style="font-size: 0.9rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 1rem;">
+            Recent Alerts</h3>
+          {% for log in recent_updates %}
+          <div class="alert-item" style="padding: 0.75rem 0; border-bottom: 1px solid var(--border);">
+            <div style="font-size: 0.85rem; font-weight: 600;">{{ log[1] }} Status</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted);">{{ log[2] }}</div>
+            <div style="font-size: 0.7rem; color: var(--accent); margin-top: 0.2rem;">{{ log[3] }}</div>
+          </div>
+          {% endfor %}
+      </aside>
   </div>
+  </main>
+  </div>
+
+  <script>
+    lucide.createIcons();
+
+    function toggleEditStats() {
+        const form = document.getElementById('editStatsForm');
+        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    }
+
+    // Search Functionality for Alerts
+    const searchInput = document.getElementById('recordSearch');
+    const alertItems = document.querySelectorAll('.alert-item');
+
+    searchInput.addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase();
+
+      alertItems.forEach(item => {
+        const text = item.textContent.toLowerCase();
+        if (text.includes(query)) {
+          item.style.display = '';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    });
+  </script>
 </body>
 
 </html>

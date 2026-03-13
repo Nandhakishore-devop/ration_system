@@ -4,6 +4,7 @@ import datetime
 import os
 import requests
 from dotenv import load_dotenv
+from twilio.rest import Client
 
 load_dotenv() # Load variables from .env file
 
@@ -90,19 +91,28 @@ def translate_to_tamil(status, items):
     return msg
 
 def simulate_sms_sending(status, items):
-    """Sends real SMS via Fast2SMS to all registered users."""
+    """Sends real SMS via Twilio to all registered users."""
     message = translate_to_tamil(status, items)
     
-    # --- FAST2SMS CONFIGURATION ---
-    # We prioritize the environment variable if present, otherwise use the hardcoded fallback
-    hardcoded_key = "rmJEDw3Ub6ZkfvpbmgK8zn0R6myVJjKbbH36pdmhRlF49W3bXpGSD62e512B"
-    API_KEY = os.environ.get("FAST2SMS_API_KEY", hardcoded_key).strip()
+    # --- TWILIO CONFIGURATION ---
+    account_sid = os.environ.get("TWILIO_ACCOUNT_SID")
+    auth_token = os.environ.get("TWILIO_AUTH_TOKEN")
+    twilio_number = os.environ.get("TWILIO_PHONE_NUMBER")
     
-    # If the environment variable gives us the old 'disabled' key, manually override it
-    if API_KEY.startswith("ENIs"):
-        API_KEY = hardcoded_key
-        
-    URL = "https://www.fast2sms.com/dev/bulkV2"
+    if not all([account_sid, auth_token, twilio_number]) or "your_" in (account_sid + auth_token + twilio_number):
+        print("⚠️ Twilio credentials missing or using placeholders. SMS skipped.")
+        with open("sms_logs.txt", "a", encoding="utf-8") as f:
+            timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            f.write(f"\n--- Twilio Attempt SKIPPED at {timestamp} ---\n")
+            f.write("REASON: Missing or placeholder credentials in .env\n")
+            f.write("-" * 30 + "\n")
+        return 0
+
+    try:
+        client = Client(account_sid, auth_token)
+    except Exception as e:
+        print(f"❌ Error initializing Twilio Client: {e}")
+        return 0
     # ------------------------------
 
     conn = sqlite3.connect('database.db')
@@ -111,56 +121,44 @@ def simulate_sms_sending(status, items):
     users = cursor.fetchall()
     conn.close()
 
-    # Clean numbers: Remove '+' and spaces. Fast2SMS likes 10-digit or 91-prefix numbers.
-    cleaned_numbers = []
-    for (phone,) in users:
-        clean = "".join(filter(str.isdigit, phone)) # Keep only digits
-        if len(clean) >= 10:
-            cleaned_numbers.append(clean)
-    
-    phone_numbers = ",".join(cleaned_numbers)
-    
-    if not phone_numbers:
+    if not users:
         return 0
 
-    # Fast2SMS Payload
-    payload = {
-        "route": "q",
-        "message": message,
-        "language": "unicode",
-        "numbers": phone_numbers,
-    }
-    
-    headers = {
-        "authorization": API_KEY,
-        "Content-Type": "application/x-www-form-urlencoded",
-    }
+    # Twilio sends messages individually
+    success_count = 0
+    error_count = 0
 
-    # Logging for verification
     with open("sms_logs.txt", "a", encoding="utf-8") as f:
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        f.write(f"\n--- Fast2SMS Attempt at {timestamp} ---\n")
+        f.write(f"\n--- Twilio SMS Batch at {timestamp} ---\n")
         f.write(f"Message: {message}\n")
-        f.write(f"Numbers: {phone_numbers}\n")
         
-        try:
-            if API_KEY == "YOUR_API_KEY_HERE":
-                f.write("STATUS: SKIPPED (Placeholder API Key used)\n")
-                print("⚠️ SMS skipped: Please provide a real Fast2SMS API Key in the .env file.")
-            else:
-                # Log first 4 chars of key for debug (SAFE)
-                debug_key = f"{API_KEY[:4]}...{API_KEY[-4:]}" if len(API_KEY) > 8 else "too short"
-                f.write(f"DEBUG_KEY_MASKED: {debug_key}\n")
+        for (phone,) in users:
+            try:
+                # Basic formatting: Twilio prefers E.164 (e.g., +919876543210)
+                # If number doesn't start with +, we assume +91 (India) as per previous context
+                formatted_phone = phone.strip()
+                if not formatted_phone.startswith('+'):
+                    # Strip non-digits and add +91
+                    clean = "".join(filter(str.isdigit, formatted_phone))
+                    formatted_phone = f"+91{clean}" if len(clean) == 10 else f"+{clean}"
+
+                message_sent = client.messages.create(
+                    body=message,
+                    from_=twilio_number,
+                    to=formatted_phone
+                )
+                f.write(f"SENT to {formatted_phone}: {message_sent.sid}\n")
+                success_count += 1
+            except Exception as e:
+                f.write(f"ERROR to {phone}: {str(e)}\n")
+                error_count += 1
                 
-                response = requests.post(URL, data=payload, headers=headers)
-                f.write(f"STATUS: {response.status_code} - {response.text}\n")
-                print(f"Fast2SMS Response: {response.status_code} - {response.text}")
-        except Exception as e:
-            f.write(f"ERROR: {str(e)}\n")
-            
+        f.write(f"SUMMARY: {success_count} success, {error_count} failed\n")
         f.write("-" * 30 + "\n")
     
-    return len(users)
+    print(f"Twilio Batch Complete: {success_count} sent, {error_count} failed.")
+    return success_count
 
 def analyze_best_time():
     """Simple data analysis to find the hour with most 'Empty' or 'Manageable' reports."""
@@ -304,16 +302,24 @@ def register():
 if __name__ == '__main__':
     init_db()
     
-    # Diagnostic check for Internet/DNS
+    # Diagnostic check for Internet/DNS and Twilio
     print("\n--- Starting Diagnostics ---")
     try:
         requests.get("https://www.google.com", timeout=3)
         print("✅ Internet Connection: OK")
-        requests.get("https://www.fast2sms.com", timeout=3)
-        print("✅ Fast2SMS Server: REACHABLE")
+        requests.get("https://api.twilio.com", timeout=3)
+        print("✅ Twilio Server: REACHABLE")
+        
+        # Check for credentials
+        if all([os.environ.get("TWILIO_ACCOUNT_SID"), os.environ.get("TWILIO_AUTH_TOKEN"), os.environ.get("TWILIO_PHONE_NUMBER")]):
+            if "your_" not in os.environ.get("TWILIO_ACCOUNT_SID", ""):
+                 print("✅ Twilio Credentials: FOUND")
+            else:
+                 print("⚠️ Twilio Credentials: PLACEHOLDERS DETECTED")
+        else:
+            print("❌ Twilio Credentials: MISSING")
     except Exception as e:
         print(f"❌ Connection Error: {e}")
-        print("Please check your internet connection or DNS settings.")
     print("--- Diagnostics End ---\n")
 
     app.run(debug=True)

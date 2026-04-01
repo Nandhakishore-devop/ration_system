@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Smart Ration</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+    <div class="app-container">
+        <header>
+            <div class="brand">
+                <div class="brand-icon">
+                    <i data-lucide="gem" color="white" size="24"></i>
+                </div>
+                <span>SMART RATION</span>
+            </div>
+            <nav>
+                <a href="/">Dashboard</a>
+                <a href="/register">New Registration</a>
+                <a href="/customers">Customer Details</a>
+            </nav>
+            <div class="header-actions">
+                <a href="/settings" style="display: flex; align-items: center;"><i data-lucide="settings" size="20"
+                        color="#9ba1b0"></i></a>
+                <a href="/profile" class="active"
+                    style="width: 32px; height: 32px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; color: white; text-decoration: none; font-weight: bold; font-size: 0.8rem; box-shadow: 0 0 15px var(--accent-glow);">NK</a>
+            </div>
+        </header>
+
+        <main style="max-width: 600px; margin: 0 auto;">
+            <section class="card glass profile-card" style="text-align: center; padding-top: 4rem;">
+                <div
+                    style="position: absolute; top: 0; left: 0; right: 0; height: 100px; background: linear-gradient(135deg, var(--accent), #7f56d9); opacity: 0.3;">
+                </div>
+
+                <div
+                    style="width: 120px; height: 120px; border-radius: 50%; background: var(--accent); border: 4px solid var(--bg); margin: 0 auto 1.5rem; position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: 700;">
+                    NK
+                </div>
+
+                <h1 style="font-size: 2rem; margin-bottom: 0.25rem;">{{ admin.name }}</h1>
+                <p
+                    style="color: var(--accent); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem; margin-bottom: 2rem;">
+                    {{ admin.post }}</p>
+
+                <div
+                    style="display: grid; gap: 1rem; text-align: left; background: var(--bg); padding: 1.5rem; border-radius: 20px; border: 1px solid var(--border);">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border);">
+                        <span style="color: var(--text-muted); font-size: 0.9rem;">Admin ID</span>
+                        <span style="font-family: monospace; font-weight: 600;">{{ admin.id }}</span>
+                    </div>
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border);">
+                        <span style="color: var(--text-muted); font-size: 0.9rem;">Access Level</span>
+                        <span class="badge badge-premium" style="margin-bottom: 0;">Full Administrative</span>
+                    </div>
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border);">
+                        <span style="color: var(--text-muted); font-size: 0.9rem;">Joining Date</span>
+                        <span style="font-weight: 600;">{{ admin.joined }}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="color: var(--text-muted); font-size: 0.9rem;">Designated Zone</span>
+                        <span style="font-weight: 600;">{{ admin.location }}</span>
+                    </div>
+                </div>
+
+                <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+                    <button class="btn-submit"
+                        style="flex: 1; justify-content: center; background: var(--surface); color: white; border: 1px solid var(--border);">
+                        <i data-lucide="edit-3" size="18"></i> EDIT PROFILE
+                    </button>
+                    <button class="btn-submit"
+                        style="flex: 1; justify-content: center; background: var(--danger); color: white;">
+                        <i data-lucide="log-out" size="18"></i> LOGOUT
+                    </button>
+                </div>
+            </section>
+
+            <div style="margin-top: 2rem; text-align: center;">
+                <a href="/" style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem;">
+                    <i data-lucide="arrow-left" size="14" style="vertical-align: middle;"></i> Return to Dashboard
+                </a>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>

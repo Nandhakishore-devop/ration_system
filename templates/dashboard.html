@@ -19,7 +19,7 @@
         <div class="brand-icon">
           <i data-lucide="gem" color="white" size="24"></i>
         </div>
-        <span>SMART RATION</span>
+        <span>{{ shop_name }}</span>
       </div>
 
       <nav>
@@ -34,8 +34,10 @@
           <input type="text" id="recordSearch" placeholder="Search records...">
         </div>
         <i data-lucide="bell" size="20" color="#9ba1b0" style="cursor: pointer;"></i>
-        <i data-lucide="settings" size="20" color="#9ba1b0" style="cursor: pointer;"></i>
-        <div style="width: 32px; height: 32px; border-radius: 50%; background: #ccc; cursor: pointer;"></div>
+        <a href="/settings" style="display: flex; align-items: center;"><i data-lucide="settings" size="20"
+            color="#9ba1b0" style="cursor: pointer;"></i></a>
+        <a href="/profile"
+          style="width: 32px; height: 32px; border-radius: 50%; background: #45b26b; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; text-decoration: none; font-weight: bold; font-size: 0.8rem;">NK</a>
       </div>
     </header>
 
@@ -120,8 +122,8 @@
             <div class="stat-card glass" style="position: relative;">
               <div class="stat-value" id="displayWaiting">{{ waiting_count }}</div>
               <div class="stat-label">Waiting</div>
-              <button onclick="toggleEditStats()" 
-                      style="position: absolute; top: 5px; right: 5px; background: transparent; border: none; cursor: pointer; color: var(--text-muted);">
+              <button onclick="toggleEditStats()"
+                style="position: absolute; top: 5px; right: 5px; background: transparent; border: none; cursor: pointer; color: var(--text-muted);">
                 <i data-lucide="edit-2" size="12"></i>
               </button>
             </div>
@@ -138,17 +140,21 @@
                 <div style="flex: 1;">
                   <label style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">Waiting</label>
                   <input type="number" name="waiting_count" value="{{ waiting_count }}" required
-                         style="width: 100%; background: var(--surface); border: 1px solid var(--border); color: white; padding: 0.5rem; border-radius: 8px;">
+                    style="width: 100%; background: var(--surface); border: 1px solid var(--border); color: white; padding: 0.5rem; border-radius: 8px;">
                 </div>
                 <div style="flex: 1;">
-                  <label style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">Avg Wait</label>
+                  <label style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">Avg
+                    Wait</label>
                   <input type="text" name="avg_wait" value="{{ avg_wait }}" required
-                         style="width: 100%; background: var(--surface); border: 1px solid var(--border); color: white; padding: 0.5rem; border-radius: 8px;">
+                    style="width: 100%; background: var(--surface); border: 1px solid var(--border); color: white; padding: 0.5rem; border-radius: 8px;">
                 </div>
               </div>
               <div style="display: flex; gap: 0.5rem;">
-                <button type="submit" class="btn-submit" style="padding: 0.5rem 1rem; font-size: 0.8rem; background: var(--accent); color: white;">Save Changes</button>
-                <button type="button" onclick="toggleEditStats()" style="padding: 0.5rem 1rem; font-size: 0.8rem; background: transparent; border: 1px solid var(--border); color: var(--text-muted); border-radius: 8px;">Cancel</button>
+                <button type="submit" class="btn-submit"
+                  style="padding: 0.5rem 1rem; font-size: 0.8rem; background: var(--accent); color: white;">Save
+                  Changes</button>
+                <button type="button" onclick="toggleEditStats()"
+                  style="padding: 0.5rem 1rem; font-size: 0.8rem; background: transparent; border: 1px solid var(--border); color: var(--text-muted); border-radius: 8px;">Cancel</button>
               </div>
             </form>
           </div>
@@ -181,8 +187,8 @@
     lucide.createIcons();
 
     function toggleEditStats() {
-        const form = document.getElementById('editStatsForm');
-        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+      const form = document.getElementById('editStatsForm');
+      form.style.display = form.style.display === 'none' ? 'block' : 'none';
     }
 
     // Search Functionality for Alerts

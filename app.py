@@ -78,7 +78,7 @@ def init_db():
     conn.commit()
     conn.close()
 
-def translate_to_tamil(status, items):
+def translate_to_tamil(status, items, recommendation):
     """Simple translation logic for the SMS notification."""
     status_map = {
         "Empty": "காலியாக உள்ளது (Empty)",
@@ -87,12 +87,16 @@ def translate_to_tamil(status, items):
     }
     tamil_status = status_map.get(status, status)
     
-    msg = f"ரேஷன் கடை அப்டேட்:\nவரிசை: {tamil_status}\nகிடைக்கும் பொருட்கள்: {items}\nஇப்போது வரலாம்."
+    msg = f"ரேஷன் கடை அப்டேட்:\nவரிசை: {tamil_status}\nகிடைக்கும் பொருட்கள்: {items}"
+    if recommendation and "Not enough data" not in recommendation:
+        msg += f"\nசிறந்த நேரம்: {recommendation}"
+    
+    msg += "\nஇப்போது வரலாம்."
     return msg
 
-def simulate_sms_sending(status, items):
+def simulate_sms_sending(status, items, recommendation):
     """Sends real SMS via Twilio to all registered users."""
-    message = translate_to_tamil(status, items)
+    message = translate_to_tamil(status, items, recommendation)
     
     # --- TWILIO CONFIGURATION ---
     account_sid = os.environ.get("TWILIO_ACCOUNT_SID")
@@ -189,6 +193,9 @@ def home():
     conn = sqlite3.connect('database.db')
     cursor = conn.cursor()
 
+    # Fetch recommendation
+    recommendation = analyze_best_time()
+    
     if request.method == 'POST':
         queue_status = request.form.get('queue_status')
         items = request.form.getlist('items')
@@ -201,15 +208,9 @@ def home():
         conn.commit()
 
         # Trigger SMS simulation
-        count = simulate_sms_sending(queue_status, items_string)
-        
-        # After update, we could also decrement stock here if we want, 
-        # but for now we just log it.
+        count = simulate_sms_sending(queue_status, items_string, recommendation)
         
         return f"<h2>Data Saved & {count} SMS Simulants Logged ✅</h2><a href='/'>Go Back</a>"
-
-    # Fetch recommendation
-    recommendation = analyze_best_time()
     
     # Fetch inventory
     cursor.execute("SELECT * FROM inventory")
@@ -230,13 +231,15 @@ def home():
     avg_wait = q_stats[1] if q_stats else '8m'
 
     conn.close()
+    shop_name = os.environ.get("SHOP_NAME", "SMART RATION")
     return render_template('dashboard.html', 
                            recommendation=recommendation, 
                            inventory=inventory,
                            recent_updates=recent_updates,
                            user_count=user_count,
                            waiting_count=waiting_count,
-                           avg_wait=avg_wait)
+                           avg_wait=avg_wait,
+                           shop_name=shop_name)
 
 @app.route('/update_stats', methods=['POST'])
 def update_stats():
@@ -298,6 +301,27 @@ def register():
             return "<h2>Phone number already registered! ❌</h2><a href='/register'>Try Again</a>"
 
     return render_template('register.html')
+
+@app.route('/settings', methods=['GET', 'POST'])
+def settings():
+    shop_name = os.environ.get("SHOP_NAME", "SMART RATION")
+    if request.method == 'POST':
+        new_name = request.form.get('shop_name')
+        # In a real app, we'd save this to a database or config file
+        # For now, we'll just mock it or suggest the user update .env
+        return f"<h2>Settings Updated! (Mock) ✅</h2><p>New Shop Name: {new_name}</p><a href='/'>Go to Dashboard</a>"
+    return render_template('settings.html', shop_name=shop_name)
+
+@app.route('/profile')
+def profile():
+    admin_info = {
+        "name": "Nandhakishore",
+        "post": "Chief Administrator",
+        "id": "ADM-2026-001",
+        "joined": "January 2026",
+        "location": "Regional Office 04"
+    }
+    return render_template('profile.html', admin=admin_info)
 
 if __name__ == '__main__':
     init_db()
